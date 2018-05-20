@@ -1,8 +1,33 @@
+{-# LANGUAGE FlexibleInstances #-}
+
+module Monomial
+( Vars(X,Y,Z)
+, Monomial(M)
+, inject
+, toList
+, fromList
+, exponent
+, variables
+, isDivisibleBy
+, div
+, lcm
+, complement
+, HasDegree
+, degree
+) where
+
+import Data.Maybe
 import qualified Data.Map as Map
+import Prelude hiding (lcm, div, lex, exponent)
 
-data Vars = X1 | X2 | X3 | X4 | X5 deriving (Eq, Ord, Show)
+data Vars = X | Y | Z deriving (Eq, Ord, Show)
 
-newtype Monomial v o = M (Map v Int) deriving Eq
+class Ord a => Enumerable a where
+    enumerate :: [a]
+
+instance Enumerable Vars where enumerate = [X, Y, Z]
+
+newtype Monomial v o = M (Map.Map v Int) deriving Eq
 
 inject :: Eq v => v -> Monomial v o
 inject x = M $ Map.singleton x 1
@@ -58,15 +83,6 @@ lcm (M a) (M b) = M $ Map.unionWith max a b
 complement :: Ord v => Monomial v o -> Monomial v o -> Monomial v o
 complement m n = lcm m n `div` m
 
-instance (Show v, Enumerable v) => Ord (Monomial v Lex) where
-    (<=) = lex
-instance (Show v, Enumerable v) => Ord (Monomial v RevLex) where
-    (<=) = revlex
-instance (Show v, Enumerable v) => Ord (Monomial v DegLex) where
-    (<=) = deglex
-instance (Show v, Enumerable v) => Ord (Monomial v DegRevLex) where
-        (<=) = degrevlex
-
 data Lex         -- Lexicographic ordering
 data RevLex      -- Reverse lexicographic ordering
 data DegLex      -- Degree lexicographic ordering
@@ -86,7 +102,11 @@ deglex    a b = degree a <= degree b
 degrevlex a b = degree a <= degree b
                 && (degree a /= degree b || b `revlex` a)
 
-class Ord a => Enumerable a where
-    enumerate :: [a]
-
-instance Enumerable Vars where enumerate = [X1, X2, X3, X4, X5]
+instance (Show v, Enumerable v) => Ord (Monomial v Lex) where
+     (<=) = lex
+instance (Show v, Enumerable v) => Ord (Monomial v RevLex) where
+    (<=) = revlex
+instance (Show v, Enumerable v) => Ord (Monomial v DegLex) where
+    (<=) = deglex
+instance (Show v, Enumerable v) => Ord (Monomial v DegRevLex) where
+        (<=) = degrevlex
