@@ -18,18 +18,15 @@ module Monomial
 , Enumerable
 , enumerate
 , Lex
+, DegLex
 ) where
 
 import Data.Maybe
 import qualified Data.Map as Map
 import Prelude hiding (lcm, div, lex, exponent)
 
---data Vars = X | Y | Z deriving (Eq, Ord, Show)
-
 class Ord a => Enumerable a where
     enumerate :: [a]
-
---instance Enumerable Vars where enumerate = [X, Y, Z]
 
 newtype Monomial v o = M (Map.Map v Int) deriving Eq
 
