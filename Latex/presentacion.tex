@@ -1,0 +1,322 @@
+\documentclass{beamer}
+\usetheme{default}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english,spanish]{babel}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{colortbl}
+\usepackage{tikz}
+
+\definecolor{myyellow}{rgb}{1,1,0.8}
+\definecolor{mygreen}{rgb}{0.8,1,0.8}
+\newcommand<>{\srccell}{\only#1{\color{blue}}}
+\newcommand<>{\rescell}{\only#1{\color{red}}}
+\newcommand<>{\colorhide}{\only#1{\color{lightgray}}}
+%\centering\let\\\tabularnewline
+\newcolumntype{M}{>{\hfill$}p{2em}<{$\hfill}}
+
+\author{Egor Maximenko}
+\institute{ESFM del IPN}
+\title{División sintética}
+\subtitle{también conocida como\\Algoritmo de Horner o Regla de Ruffini}
+\hypersetup{pdfkeywords={división sintética,algoritmo de Horner,regla de Ruffini}}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Algoritmo}
+
+\subsection{Fórmulas}
+\begin{frame}{Fórmulas}
+Dividir un polinomio $f(x)$ entre un binomio $(x-c)$
+significa hallar un polinomio $q(x)$ y un número $r$ tales que
+\[
+  f(x)=(x-c)q(x)+r.
+\]%
+\uncover<2->{Escribamos esta igualdad con más detalles:}\\\medskip
+\begin{tikzpicture}
+  \tikzstyle{every node}=[text centered]
+  \uncover<3->{
+  \alert<4,5>{\node (f0) at (-5em,0em) {$f_0 x^n$};}
+    \node (f0pf1) at (-3.5em,0em) {$+$};
+  \alert<6,7>{\node (f1) at (-1.5em,0em) {$f_1 x^{n-1}$};}
+    \node (f1pf2) at (0.5em,0em) {$+$};
+  \alert<8,9>{\node (f2) at (2.5em,0em) {$f_2 x^{n-2}$};}
+    \node (f2petc) at (4.5em,0em) {$+$};
+  \alert<10>{\node (etctop) at (6em,0em) {$\ldots\mathstrut$};}
+    \node (etcpfn1) at (7em,0em) {$+$};
+  \alert<11,12>{\node (fn1) at (9em,0em) {$f_{n-1} x\mathstrut$};}
+    \node (fn1pfn) at (11em,0em) {$+$};
+  \alert<13,14>{\node (fn) at (12em,0em) {$f_n\mathstrut$};}
+    \node (eqtop) at (13em,0em) {$=$};
+
+  \node (lefteq) at (-6em,-2em) {$=$};
+  \node (leftbr1) at (-5.3em,-2em) {$($};
+  \alert<4,5,6,7,8,9,11,12>{\node (x) at (-4.8em,-2em) {$x\mathstrut$};}
+  \alert<6,7,8,9,11,12,13,14>{\node (xmc) at (-3.9em,-2em) {$-$};}
+  \alert<6,7,8,9,11,12,13,14>{\node (c) at (-2.8em,-2em) {$c\mathstrut$};}
+  \node (rightbr1) at (-2.4em,-2em) {$)$};
+  \node (leftbr2) at (-1.7em,-2em) {$($};
+  \alert<4,5,6,7>{\node (q0) at (0em,-2em) {$q_0 x^{n-1}$};}
+    \node (q0pq1) at (2em,-2em) {$+$};
+  \alert<6,7,8,9>{\node (q1) at (4em,-2em) {$q_1 x^{n-2}$};}
+    \node (q1pq2) at (6em,-2em) {$+$};
+  \alert<8,9>{\node (q2) at (8em,-2em) {$q_2 x^{n-3}$};}
+    \node (q2petc) at (10em,-2em) {$+$};
+  \alert<10>{\node (etcbot) at (11.2em,-2em) {$\ldots\mathstrut$};}
+    \node (etcqn2) at (12.2em,-2em) {$+$};
+  \alert<11,12>{\node (qn2) at (14.2em,-2em) {$q_{n-2} x\mathstrut$};}
+    \node (qn1qfn) at (16.2em,-2em) {$+$};
+  \alert<11,12,13,14>{\node (qn1) at (17.7em,-2em) {$q_{n-1}\mathstrut$};}
+  \node (rightbr2) at (19em,-2em) {$)$};
+  \node (pc) at (19.8em,-2em) {$+$};
+  \alert<13,14>{\node (r) at (20.5em,-2em) {$r$};}
+  \node (endpunct) at (21em,-2em) {$.\mathstrut$};
+  }
+
+  \visible<4,5>{
+    \draw[-,red] (x) .. controls +(down:4ex) and +(down:4ex) .. (q0);
+  }
+  \visible<6,7>{
+    \draw[-,red] (x) .. controls +(down:5ex) and +(down:5ex) .. (q1);
+    \draw[-,red] (c) .. controls +(down:3ex) and +(down:3ex) .. (q0);
+  }
+  \visible<8,9>{
+    \draw[-,red] (x) .. controls +(down:5ex) and +(down:5ex) .. (q2);
+    \draw[-,red] (c) .. controls +(down:3ex) and +(down:3ex) .. (q1);
+  }
+  \visible<11,12>{
+    \draw[-,red] (x) .. controls +(down:5ex) and +(down:5ex) .. (qn1);
+    \draw[-,red] (c) .. controls +(down:3ex) and +(down:3ex) .. (qn2);
+  }
+  \visible<13,14>{
+    \draw[-,red] (c) .. controls +(down:4ex) and +(down:4ex) .. (qn1);
+  }
+\end{tikzpicture}\\%
+\uncover<3->{Igualemos los coeficientes:}
+\[
+  \begin{array}{rccc}
+  \uncover<4->{x^n\colon} &
+    \uncover<5->{f_0=q_0} &
+    \uncover<15->{\implies & q_0=f_0} \\
+  \uncover<6->{x^{n-1}\colon} &
+    \uncover<7->{f_1=q_1-c q_0} &
+    \uncover<15->{\implies & q_1=c q_0+f_1} \\
+  \uncover<8->{x^{n-2}\colon} &
+    \uncover<9->{f_2=q_2-c q_1} &
+    \uncover<15->{\implies & q_2=c q_1+f_2} \\
+  & \uncover<10->{\ldots} & & \\
+  \uncover<11->{x^1\colon} &
+    \uncover<12->{f_{n-1}=q_{n-1}-c q_{n-2}} &
+    \uncover<15->{\implies & q_{n-1}=c q_{n-2}+f_{n-1}} \\
+  \uncover<13->{x^0\colon} &
+    \uncover<14->{f_n=r-c q_{n-1}} &
+    \uncover<15->{\implies & r=c q_{n-1}+f_n}
+  \end{array}
+\]
+\end{frame}
+
+\subsection{Como funciona}
+\begin{frame}{Como funciona}
+Usando la división sintética dividamos
+el polinomio\quad $f(x)=x^3-5x^2+8$\quad entre el binomio\quad $x-2$.
+\[
+  \tikzstyle{fcell}=[shape=rectangle,text width=1.5em,text centered,draw]
+  \tikzstyle{gcell}=[shape=rectangle,text width=1.5em,text centered,draw]
+  \begin{tikzpicture}
+    \uncover<2->{
+    \node[fcell][label=above:$f_0$] (a0) at (0,2) {$1$};
+    \node[fcell][label=above:$f_1$] (a1) at (1,2) {$-5$};
+    \node[fcell][label=above:$f_2$] (a2) at (2,2) {$0$};
+    \node[fcell][label=above:$f_3$] (a3) at (3,2) {$8$};
+
+    \node[gcell][label=below:$c$] (c) at (-2,0) {2};
+    }
+
+    \uncover<3->{
+    \node[gcell][label=below:$q_0$] (b0) at (0,0) {{\visible<5->{$1$}}};
+    \node[gcell][label=below:$q_1$] (b1) at (1,0) {{\visible<7->{$-3$}}};
+    \node[gcell][label=below:$q_2$] (b2) at (2,0) {{\visible<9->{$-6$}}};
+    \node[gcell][label=below:$r$] (r)  at (3,0) {{\visible<11->{$-4$}}};
+    }
+
+    \uncover<4,5>{
+    \draw[->] (a0) to (b0);
+    }
+
+    \uncover<6,7>{
+    \draw[->] (c) .. node[above]{$\cdot$} controls +(up:4ex) and +(up:4ex) .. (b0);
+    \draw[->] (b0) to node[left]{$+$} (a1);
+    \draw[->] (a1) to (b1);
+    }
+
+    \uncover<8,9>{
+    \draw[->] (c) .. node[above]{$\cdot$} controls +(up:4ex) and +(up:4ex) .. (b1);
+    \draw[->] (b1) to node[left]{$+$} (a2);
+    \draw[->] (a2) to (b2);
+    }
+
+    \uncover<10,11>{
+    \draw[->] (c) .. node[above]{$\cdot$} controls +(up:4ex) and +(up:4ex) .. (b2);
+    \draw[->] (b2) to node[left]{$+$} (a3);
+    \draw[->] (a3) to (r);
+    }
+  \end{tikzpicture}
+\]
+\begin{overlayarea}{\textwidth}{6ex}
+\only<2>{Escribimos los coeficientes del polinomio dado: $f_0,f_1,f_2,f_3$.\\
+Si dividimos entre $(x-c)$, entonces en la segunda fila en la izquierda escribimos $c$.}
+\only<3>{Preparamos celulas vacías para el residuo $r$\\
+y los coeficientes del cociente $q_0,q_1,q_2$.}
+\only<4,5>{$q_0\quad :=\quad f_0\quad =\quad${\visible<5>{$1$}}}
+\only<6,7>{$q_1\quad :=\quad c\cdot q_0+f_1\quad
+  = \quad 2\cdot 1-5\quad=\quad${\visible<7>{$-3$}}}
+\only<8,9>{$q_2\quad :=\quad c\cdot q_1+f_2\quad
+  = \quad 2\cdot(-3)+0\quad=\quad${\visible<9>{$-6$}}}
+\only<10,11>{$r\quad :=\quad c\cdot q_2+f_3\quad
+  = \quad 2\cdot(-6)+8\quad=\quad${\visible<11>{$-4$}}}
+\only<12>{Respuesta:\quad $q(x)=x^2-3x-6$,\quad $r=-4$;\\
+  $f(x)=(x-2)(x^2-3x-6)-4$.}
+\end{overlayarea}
+\end{frame}
+
+\subsection{En forma de tabla}
+
+\begin{frame}{División sintética escrita en forma de tabla}
+Mostremos como escribir brevemente la división del polinomio\\
+$f(x)=2x^4-7x^2+6x+3$\quad entre el binomio\quad $x+1$:\\
+\begin{center}
+  \uncover<2->{
+  \begin{tabular}{M|M|M|M|M|M}
+   & \srccell<3>2 &
+  \srccell<5>0 &
+  \srccell<7>-7 &
+  \srccell<9>6 &
+  \srccell<11>3
+  \\ \hline
+  \srccell<5,7,9,11> -1 &
+  \rescell<4>\srccell<5>\uncover<4->{2} &
+  \rescell<6>\srccell<7>\uncover<6->{-2} &
+  \rescell<8>\srccell<9>\uncover<8->{-5} &
+  \rescell<10>\srccell<11>\uncover<10->{11} &
+  \rescell<12>\uncover<12->{-8}
+  \end{tabular}
+  }
+\end{center}
+\begin{overlayarea}{\textwidth}{6ex}
+\only<2>{Dibujamos una tabla de dos filas, copeamos en ella\\
+los coeficientes de $f$ y el número $c$ (si dividimos entre $x-c$).}
+\only<3,4>{Copeamos el mayor coeficiente:\quad{\visible<4>{$2$.}}}
+\only<5,6>{Calculamos:\quad $(-1)\cdot 2+0\quad=\quad${\visible<6>{$-2$.}}}
+\only<7,8>{Calculamos:\quad $(-1)\cdot(-2)+(-7)\quad=\quad${\visible<8>{$-5$.}}}
+\only<9,10>{Calculamos:\quad $(-1)\cdot(-5)+6\quad=\quad${\visible<10>{$11$.}}}
+\only<11,12>{Calculamos:\quad $(-1)\cdot 11+3\quad=\quad${\visible<12>{$-8$.}}}
+\only<13>{Respuesta:\quad $q(x)=2x^3-2x^2-5x+11$,\quad $r=-8$.}
+\end{overlayarea}
+\end{frame}
+
+
+\section{Aplicaciones}
+\subsection{Cálculo de los valores de polinomios}
+
+\begin{frame}{Cálculo de los valores de polinomios}
+Suponemos que:
+\[
+  f(x)=q(x)\cdot (x-c)+r.
+\]
+
+\uncover<2->{Sustituimos $x$ por $c$:}
+\[
+\uncover<2->{f(c)=}
+\only<2>{\alert{?\phantom{.}}}\only<3->{r.}
+\]
+
+\uncover<4->{\noindent\textbf{Teorema del resto (teorema de Bézout).}\\
+El valor del polinomio $f(x)$ en un punto $c$\\
+es igual con el resto al dividir $f(x)$ entre $(x-c)$.
+}
+
+\bigskip
+\uncover<5->{%
+Calculemos el valor de $f(x)=x^3-3x^2+7x-5$ en el punto $3$:
+\[
+  \begin{tabular}{M|MMMM}
+    & 1 & -3 & 7 & -5 \\ \hline
+  3 & 1 & 0 & 7 & \boxed{16}
+  \end{tabular}
+\]
+Respuesta: $f(3)=16$.
+}
+\end{frame}
+
+\subsection{Expansión del polinomio en potencias de un binomio}
+
+\begin{frame}{Expansión del polinomio en potencias de un binomio}
+Usando el algoritmo de Horner, desarrolemos
+$f(x)=x^3+3x^2-2x+4$ por las potencias de $(x+2)$.
+\begin{center}
+  \begin{tabular}{M | M M M M}
+    & 1 & 3 & -2 & 4
+  \visible<2->{\\ -2 & 1 & 1 & -4 & \boxed{12}}
+  \visible<3->{\\ -2 & 1 & -1 & \boxed{-2}}
+  \visible<4->{\\ -2 & 1 & \boxed{-3}}
+  \visible<5->{\\ -2 & \boxed{1}}
+  \end{tabular}
+\end{center}
+\begin{align*}
+  x^3+3x^2-2x+4
+  \visible<2->{&= (x^2+x-4)(x+2)+12 \\}
+  \visible<3->{&= ((x-1)(x+2)-2)(x+2)+12 \\}
+  \visible<4->{&= (((1\cdot(x+2)-3)(x+2)-2)(x+2)+12 \\}
+  \visible<5->{&= (x+2)^3-3(x+2)^2-2(x+2)+12.}
+\end{align*}
+\end{frame}
+
+\subsection{Búsqueda de ceros enteros de un polinomio}
+
+\begin{frame}{Búsqueda de ceros enteros de un polinomio}
+Usando el algoritmo de Horner, calculemos los ceros del polinomio:
+\[
+  f(x)=x^4-2x^3+2x^2-x-6.
+\]
+Si un polinomio tiene coeficientes enteros,
+hay que buscar sus ceros enteros entre los divisores
+del coeficiente constante:
+$\pm1,\pm2,\pm3,\pm6$.
+\[
+  \begin{tabular}{MM|MMMMM}
+  \uncover<2->{ & & 1 & -2 &  2 & -1 & -6 \\}
+  \uncover<3->{  &
+    \colorhide<4-> 1 &
+    \colorhide<4-> 1 &
+    \colorhide<4-> -1 &
+    \colorhide<4-> 1 &
+    \colorhide<4-> 0 &
+    \colorhide<4-> -6 \\}
+  \uncover<5->{
+    \uncover<6->{\checkmark} & -1 &  1 & -3 &  5 & -6 & \boxed{0} \\}
+  \uncover<7->{ &
+    \colorhide<8-> -1 &
+    \colorhide<8-> 1 &
+    \colorhide<8-> -4 &
+    \colorhide<8-> 9 &
+    \colorhide<8-> -15 \\}
+  \uncover<9->{
+    \uncover<10->{\checkmark} &  2 &  1 & -1 &  3 & \boxed{0} }
+  \end{tabular}
+\]
+\[
+  \uncover<6->{f(x)=(x+1)(x^3-3x^2+5x-6)}
+  \uncover<10->{=(x+1)(x-2)(x^2-x+3).}
+\]
+\uncover<11->{El polinomio $x^2-x+3$ no tiene ceros enteros porque $D<0$.}
+\uncover<12->{\par\noindent Respuesta: $-1$, $2$.}
+\end{frame}
+\end{document}
