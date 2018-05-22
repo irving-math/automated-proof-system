@@ -129,3 +129,7 @@ groebner_optimized i = go i ps
           | otherwise = go (h:s) (ps' ++ [(h, f) | f <- s, not (pc h f)])
           where
             h = normal_form (spoly f g) s
+
+groebner :: (Eq r, Fractional r, Ord v, Show v, Ord (Monomial v o))
+          => [Polynomial r v o] -> [Polynomial r v o]
+groebner = groebner_optimized

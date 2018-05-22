@@ -1,5 +1,7 @@
 {-# LANGUAGE TemplateHaskell, FlexibleInstances, FlexibleContexts #-}
 {-# LANGUAGE TypeOperators, MultiParamTypeClasses #-}
+{-# LANGUAGE OverlappingInstances #-}
+
 module Variable where
 
 import Monomial

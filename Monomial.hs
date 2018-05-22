@@ -17,6 +17,7 @@ module Monomial
 , degree
 , Enumerable
 , enumerate
+, Lex
 ) where
 
 import Data.Maybe
