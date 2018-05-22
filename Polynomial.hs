@@ -1,5 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 
+module Polynomial where
+
 import Monomial
 import Data.List(intersect)
 
