@@ -2,3 +2,12 @@
 *.dyn_hi
 *.dyn_o
 *.o
+Latex/*.aux
+Latex/*.log
+Latex/*.nav
+Latex/*.out
+Latex/*.pdf
+Latex/*.snm
+Latex/*.synctex.gz
+Latex/*.toc
+Latex/*.vrb
