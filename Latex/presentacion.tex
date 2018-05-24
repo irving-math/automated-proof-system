@@ -1,12 +1,39 @@
-\documentclass{beamer}
+\documentclass[10pt]{beamer}
 \usetheme{metropolis}
 \usepackage[utf8]{inputenc}
 \usepackage[english,spanish]{babel}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{colortbl}
 \usepackage{amsthm}
+\usepackage{multirow}
+\usepackage{xparse}
+\usepackage{calc}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
 \newtheorem{prop}{Propocisión}
 \def\realnumbers{\mathbb{R}}
+\newcommand{\PhantC}{\phantom{\colon}}%
+\newcommand{\PhantSQ}{\phantom{\sqrt{\hspace{0.3ex}}}}%
+\newcommand{\CenterInCol}[1]{\multicolumn{1}{c}{#1}}
+\newcommand{\gen}[1]{\ensuremath{\langle #1\rangle}}
+
+% https://tex.stackexchange.com/questions/63355/wrapping-cmidrule-in-a-macro
+\ExplSyntaxOn
+\makeatletter
+\newcommand{\CMidRule}{\noalign\bgroup\@CMidRule{}}
+\NewDocumentCommand{\@CMidRule}{
+	m % Material to reinsert before cmidrule.
+	O{0.0ex} % #1 = left adjust
+	O{0.0ex} % #1 = right adjust
+	m  %       #3 = columns to span
+}{
+	\peek_meaning_remove_ignore_spaces:NTF \CMidRule
+	{ \@CMidRule { #1 \cmidrule[\cmidrulewidth](l{#2}r{#3}){#4} } }
+	{ \egroup #1 \cmidrule[\cmidrulewidth](l{#2}r{#3}){#4} }
+}
+\makeatother
+\ExplSyntaxOff
 
 \author{Irving Flores}
 \institute{ESFM del IPN}
@@ -25,13 +52,12 @@
 \end{frame}
 
 \section{Bases de Groebner}
-
 \subsection{Motivación}
 
 \begin{frame}{Problema principal}
 
 	\begin{block}{Problema principal}
-		Sea $I = <f_1,f_2,\ldots, f_n>$ un ideal de $K[x_1,x_2,\ldots, x_m]$.
+		Sea $I = \gen{f_1,f_2,\ldots, f_n}$ un ideal de $K[x_1,x_2,\ldots, x_m]$.
 		¿Como saber si $f(x)$ pertenece al ideal?
 	\end{block}
 
@@ -69,11 +95,238 @@
 	\pause
 	Ejemplo:
 
-	¿Pertenece $x^2+1$ a $<3x^2, 6x^3-x>$?
+	¿Pertenece $x^2+1$ a $\gen{3x^2, 6x^3-x}$?
 	\begin{itemize}
 		\item $\gcd(3x^2, 6x^3-x) = x$
 		\item $x^2+1 = (x)(x)+1$
-		\item Como el residuo es $1$ entonces $x^2+1$ no pertenece a $<3x^2, 6x^3-x>$
+		\item Como el residuo es $1$ entonces $x^2+1$ no pertenece a $\gen{3x^2, 6x^3-x}$
 	\end{itemize}
 \end{frame}
+
+\begin{frame}{El caso de $K[x_1,x_2,\ldots,x_n]$}
+	\begin{block}{Algunos problemas para $K[x_1,x_2,\ldots,x_n]$}
+		\begin{itemize}
+			\item Se necesita definir un orden sobre los monomios.
+			\item $K[x_1,x_2,\ldots,x_n]$ no es un \emph{DIP}, aunque si es Noetheriano.
+			\item El algoritmo de la división clásico no sirve para el problema de la pertenencia. 
+		\end{itemize}
+	\end{block}
+	\begin{block}{Orden monomial lexicográfico}
+		Se puede definir un orden lexicografico respecto a la tupla de los exponentes de los monomios.
+		
+		Ejemplos:
+		\begin{itemize}
+			\item $x^3y^6 \leq x^7y^2$
+			\item $x^5y^6z^2 \leq x^5y^6z^3$
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}{División en $K[x_1,x_2,\ldots,x_n]$}
+	\begin{block}{División de polinomios, con varios \emph{divisores}}
+		\begin{columns}
+			\column{.5\textwidth}
+				\[
+					\begin{array}{rr}
+					a_1\colon  & \CenterInCol{y}\\
+					a_2\colon  & \CenterInCol{-1}\\
+					xy + 1\PhantC & \multirow{2}*{$\overline{|xy^2 + 1}$}\\
+					y + 1\PhantC &\\
+					& xy^2 + y\\\cline{2-2}
+					& -y + 1 \\
+					& -y - 1 \\\cline{2-2}
+					& 2
+					\end{array}
+				\]
+			\pause
+			\column{.5\textwidth}
+				\[
+					\begin{array}{rl}
+					a_1\colon  & \CenterInCol{x+y}\\
+					a_2\colon  & \\
+					xy - 1\PhantC & \multirow{2}*{$\overline{)x^2y + xy^2 + y^2}$}\\
+					y^2 - 1\PhantC &\\
+					& x^2y - x\\\cline{2-2}
+					& xy^2 + x + y^2 \\
+					& xy^2 - y \\\cline{2-2}
+					& x + y^2 + y
+					\end{array}
+				\]
+		\end{columns}	
+	\end{block}
+\end{frame}
+
+\begin{frame}{División en $K[x_1,x_2,\ldots,x_n]$}
+	\scalebox{0.85}{
+		$
+		\begin{array}[4pt]{rll}
+		a_1\colon  & \multicolumn{1}{l}{x+y}\\
+		a_2\colon  & \multicolumn{1}{l}{1}           & r\\
+		xy - 1\PhantC & \multirow{2}*{$\overline{)x^2y + xy^2+y^2}$} \\\cline{3-3}
+		y^2 - 1\PhantC &\\
+		%
+		&\PhantSQ           x^2y -     x                                         \\\CMidRule[3.0ex][9.0ex]{2-2}
+		&\PhantSQ \hphantom{x^2y +{}}  xy^2 +    x + y^2                         \\
+		&\PhantSQ \hphantom{x^2y +{}}  xy^2 -    y                               \\\CMidRule[9.0ex][5.0ex]{2-2}
+		&\PhantSQ \hphantom{x^2y +     xy^2 +{}} x +    y^2 +     y              \\\CMidRule[16.0ex][5.0ex]{2-2}
+		&\PhantSQ \hphantom{x^2y +     xy^2 +    x +{}} y^2 +     y &\to x              \\
+		&\PhantSQ \hphantom{x^2y +     xy^2 +    x +{}} y^2 -     1              \\\CMidRule[20.0ex][5.0ex]{2-2}
+		&\PhantSQ \hphantom{x^2y +     xy^2 +    x +    y^2 +{}}  y + 1          \\\CMidRule[25.0ex][1.0ex]{2-2}
+		&\PhantSQ \hphantom{x^2y +     xy^2 +    x +    y^2 + y +{}}  1 &\to x+y \\\CMidRule[25.0ex][1.0ex]{2-2}
+		&\PhantSQ \hphantom{x^2y +     xy^2 +    x +    y^2 + y +{}}  0 &\to x+y+1
+		\\
+		% Last line above should be removed -- used for alignment purposes only.
+		\end{array}
+		$
+	}
+\end{frame}
+
+\begin{frame}{Algoritmo de división en $K[x_1,x_2,\ldots,x_n]$ }
+	\begin{prop}
+		Dado un orden fijo, sean $f$ y $f_1,f_2,\ldots,f_m \in K[x_1,x_2,\ldots,x_n]$ entonces existen $a_i, r \in K[x_1,x_2,\ldots,x_n]$ tales que $f = a_1f_1+\ldots+a_mf_m + r$ donde $r=0$ o $r$ no tiene monomios que se pueden dividir por el termino líder de los $f_i$.
+	\end{prop}
+\end{frame}
+
+\begin{frame}{Cambiando el orden de los \emph{divisores}}
+\scalebox{0.85}{
+	$
+	\begin{array}[4pt]{rll}
+	a_1\colon  & \multicolumn{1}{l}{x+1}\\
+	a_2\colon  & \multicolumn{1}{l}{x}           & r\\
+	y^2 - 1\PhantC & \multirow{2}*{$\overline{)x^2y + xy^2+y^2}$} \\\cline{3-3}
+	xy - 1\PhantC &\\
+	%
+	&\PhantSQ           x^2y -     x                                         \\\CMidRule[3.0ex][9.0ex]{2-2}
+	&\PhantSQ \hphantom{x^2y +{}}  xy^2 +    x + y^2                         \\
+	&\PhantSQ \hphantom{x^2y +{}}  xy^2 -    x                               \\\CMidRule[9.0ex][5.0ex]{2-2}
+	&\PhantSQ \hphantom{x^2y +     xy^2 +{}} 2x +    y^2                     \\\CMidRule[16.0ex][5.0ex]{2-2}
+	&\PhantSQ \hphantom{x^2y +     xy^2 +    2x +{}} y^2  &\to 2x             \\
+	&\PhantSQ \hphantom{x^2y +     xy^2 +    2x +{}} y^2 -     1              \\\CMidRule[20.0ex][5.0ex]{2-2}
+	&\PhantSQ \hphantom{x^2y +     xy^2 +    2x +    y^2 +{}}  1   &\to 2x +1          \\\CMidRule[25.0ex][1.0ex]{2-2}
+	&\PhantSQ \hphantom{x^2y +     xy^2 +    2x +    y^2 -{}}  0 &\to 2x+1 \\\CMidRule[25.0ex][1.0ex]{2-2}
+	\\
+	% Last line above should be removed -- used for alignment purposes only.
+	\end{array}
+	$
+}
+\end{frame}
+
+\begin{frame}{Recapitulando}
+	\begin{block}{Problemas con división en $K[x_1,x_2,\ldots,x_n]$}
+		\begin{itemize}
+			\item El residuo no es único si se cambia el orden de los \emph{divisores}.
+			\item Si se cambia el orden monomial cambian los residuos.
+			\item No obtener un residuo de $0$ no garantiza que el polinomio no pertenezca al ideal.
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\subsection{Bases de Groebner al rescate}
+
+\begin{frame}{Que es una base de Groebner}
+	\begin{block}{Definición}
+		Sea $I$ un ideal en $K[x_1,x_2,\ldots,x_n]$ denotamos como $LT(I)$ como el conjunto de los términos lideres de los polinomios en $I$.
+		$$LT(I) = \{cx^{\alpha} | \text{ existe } f \in I \text{ con } LT(f)=cx^{\alpha} \}$$
+	\end{block}
+	\pause
+	\begin{block}{Proposición}
+	Sea $I$ un ideal en $K[x_1,x_2,\ldots,x_n]$ entonces existen $g_1,g_2,\ldots,g_r \in I$ tales que
+	$\gen{LT(I)} = \{ LT(g_1), LT(g_2), \ldots, LT(g_r)\}$
+	\end{block}
+	\pause
+	\begin{block}{Definición}
+		Dado un orden monomial fijo, un subconjunto finito $\{g_1,\ldots,g_r\}$ de $I$ se le dice \textbf{Base de Groebner} si $\gen{LT(I)} = \{ LT(g_1), LT(g_2), \ldots, LT(g_r)\}$.
+	\end{block}
+\end{frame}
+
+\begin{frame}{Utilidad de la base de Groebner}
+	\begin{block}{Proposición}
+		Sea  $G=\{g_1,\ldots,g_r\}$ una base de Groebner del ideal $I \subset K[x_1,x_2,\ldots,x_n]$, sea $f \in K[x_1,x_2,\ldots,x_n]$ Entonces $f \in I$ si y solo si el residuo de la división de $f$ sobre $G$ es $0$
+	\end{block}
+	\pause
+	\begin{block}{Idea de demostración}
+		En cada paso de la división se tiene: $$f = ag + r$$como $f, ag \in I$ entonces $r \in I$, por lo tanto $LT(r)$ es divisible por algún $LT(g_i)$ permitiendo seguir realizando el siguiente paso hasta llegar a $0$.
+	\end{block}
+\end{frame}
+
+\begin{frame}{Utilidad de la base de Groebner}
+	\begin{block}{Proposición}
+		Sea  $G=\{g_1,\ldots,g_r\}$ una base de Groebner del ideal $I \subset K[x_1,x_2,\ldots,x_n]$, sea $f \in K[x_1,x_2,\ldots,x_n]$ Entonces $f \in I$ si y solo si el residuo de la división de $f$ sobre $G$ es $0$
+	\end{block}
+	\pause
+	\begin{block}{Idea de demostración}
+		En cada paso de la división se tiene: $$f = ag + r$$como $f, ag \in I$ entonces $r \in I$, por lo tanto $LT(r)$ es divisible por algún $LT(g_i)$ permitiendo seguir realizando el siguiente paso hasta llegar a $0$.
+	\end{block}
+\end{frame}
+
+\begin{frame}{Algoritmo de Buchberger}
+	\begin{itemize}
+		\item En 1949 Groebner sugirió esto acerca de las bases.
+		\item En 1965 Buchberger alumno de Groebner descubrió el algoritmo para encontrar las bases.
+		\item Le dio el honor a su profesor llamando con su nombre a las bases.
+		\item El algoritmo es bastante sencillo de implementar en una computadora.
+	\end{itemize}
+
+	\pause
+	Ejemplos:
+	
+	si $I = \gen{x^2 - 2y^2, xy - 3}$ entonces $G=\gen{x - \frac{2}{3}y^3, y^4 - \frac{9}{2}}$
+	
+	si $I=\gen{x^3-y^6, x^{15}-y^{10}}$ entonces $G=\gen{x^{15} - x^3y^4, y^6 - x^3}$
+\end{frame}
+
+\section{Demostración automática de proposiciones geométricas}
+\subsection{Traducción de problemas geométricos}
+
+\begin{frame}{Traduciendo proposiciones geométricas a polinomios}
+	Considerando el plano cartesiano, se tiene que es posible representar las siguientes proposiciones como:
+	\begin{itemize}
+		\item {El punto $(x,y)$ es igual a $(a,b)$}
+			\begin{itemize}
+				\item $x-a$
+				\item $y-b$
+			\end{itemize}
+		\pause
+		\item La recta que une $(a_1,a_2)$ con $(b_1,b_2)$ es paralela a la recta que une $(c_1,c_2)$ con $(d_1,d_2)$
+			\begin{itemize}
+				\item $(b_2-a_2)(d_1-c_1)-(d_2-c_2)(b_1-a_1)$
+			\end{itemize}
+		\pause
+		\item La recta que une $(a_1,a_2)$ con $(b_1,b_2)$ es perpendicular a la recta que une $(c_1,c_2)$ con $(d_1,d_2)$
+			\begin{itemize}
+				\item $(b_2-a_2)(d_2-c_2)-(d_1-c_1)(b_1-a_1)$
+			\end{itemize}
+		\pause
+		\item El punto $(x,y)$ se encuentra en la recta que une $(a_1,a_2)$ con $(b_1,b_2)$.
+			\begin{itemize}
+				\item $(x-a_1)(b_1-a_1)-(b_2-a_2)(y-a_2)$
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Conexión con bases de Groebner}
+	\begin{block}{Proposición}
+		Sean $h_1,h_2, \ldots,h_l,c \in K[x_1,x_2,\ldots,x_n]$ polinomios donde cada $h_i$ representan hipótesis geométricas y $c$ una conclusión, entonces $h_1,h_2, \ldots,h_l$ implican $c$ si y solo si $c \in \gen{h_1,h_2,\ldots,h_l}$.
+	\end{block}
+	\begin{block}{Idea de demostración}
+		Si $c \in \gen{h_1,h_2,\ldots,h_l}$ entonces, algún punto $p$ en $K^n$ que satisfaga que $g_i(p)=0$ $\forall$ $i=1,\ldots,l$ entonces también cumple que $c(p)=0$.
+	\end{block}
+\end{frame}
+\subsection{Ejemplos de proposiciones}
+\begin{frame}{Ejemplos}
+
+	\begin{block}{Proposición}
+		El punto $(2,2)$ pertenece a la recta que une el centro $(0,0)$ con el punto $(6,6)$.
+	\end{block}
+
+	Traduciendo, tenemos que:
+
+	\begin{align*} 
+		h_1(x,y)                 &= 6x-6y\\
+		h_2(x,y)                 &= x-2\\
+		c(x,y)                   &= y-2
+	\end{align*}
+
+	Luego $c \in \gen{h_1,h_2}$
+\end{frame}
 \end{document}
+

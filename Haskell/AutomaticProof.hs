@@ -1,5 +1,7 @@
 {-# LANGUAGE FlexibleContexts, TypeOperators, TemplateHaskell #-}
 
+module AutomaticProof where
+
 import Monomial
 import Polynomial
 import Variable
@@ -8,6 +10,7 @@ import Language.Haskell.TH
 
 $(defineVariables ["X", "Y", "Z"])
 
+-- Ideal generico
 ideal :: [Polynomial Rational (X :<: Y) Lex]
 ideal = [x ^ 10 + x ^ 9 * y ^ 2, y ^ 8 - x ^ 2 * y ^ 7]
 
