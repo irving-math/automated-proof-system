@@ -36,7 +36,7 @@
 \ExplSyntaxOff
 
 \author{Irving Flores}
-\institute{ESFM del IPN}
+\institute{Escuela Superior de Física y Matemáticas del IPN}
 \title{Bases de Groebner}
 \subtitle{Demostración automatica de proposiciones geométricas.}
 \hypersetup{pdfkeywords={bases de Groebner, demostración automatica}}
@@ -77,7 +77,7 @@
 
 	\begin{itemize}
 		\item Para $f(x)=x^3+5x+1$ y $g(x)=x-2$ se tiene $x^3+5x+1 = (x^2+2x+9)(x-2) + 19$
-		\item Para $f(x)=x^3+5x+1$ y $g(x)=x^100$ se tiene $x^3+5x+1 = (0)(x^100) + x^3+5x+1$
+		\item Para $f(x)=x^3+5x+1$ y $g(x)=x^100$ se tiene $x^3+5x+1 = (0)(x^{100}) + x^3+5x+1$
 	\end{itemize}
 
 \end{frame}
@@ -249,16 +249,6 @@
 	\end{block}
 \end{frame}
 
-\begin{frame}{Utilidad de la base de Groebner}
-	\begin{block}{Proposición}
-		Sea  $G=\{g_1,\ldots,g_r\}$ una base de Groebner del ideal $I \subset K[x_1,x_2,\ldots,x_n]$, sea $f \in K[x_1,x_2,\ldots,x_n]$ Entonces $f \in I$ si y solo si el residuo de la división de $f$ sobre $G$ es $0$
-	\end{block}
-	\pause
-	\begin{block}{Idea de demostración}
-		En cada paso de la división se tiene: $$f = ag + r$$como $f, ag \in I$ entonces $r \in I$, por lo tanto $LT(r)$ es divisible por algún $LT(g_i)$ permitiendo seguir realizando el siguiente paso hasta llegar a $0$.
-	\end{block}
-\end{frame}
-
 \begin{frame}{Algoritmo de Buchberger}
 	\begin{itemize}
 		\item En 1949 Groebner sugirió esto acerca de las bases.
@@ -294,7 +284,7 @@
 		\pause
 		\item La recta que une $(a_1,a_2)$ con $(b_1,b_2)$ es perpendicular a la recta que une $(c_1,c_2)$ con $(d_1,d_2)$
 			\begin{itemize}
-				\item $(b_2-a_2)(d_2-c_2)-(d_1-c_1)(b_1-a_1)$
+				\item $(b_2-a_2)(d_2-c_2)+(d_1-c_1)(b_1-a_1)$
 			\end{itemize}
 		\pause
 		\item El punto $(x,y)$ se encuentra en la recta que une $(a_1,a_2)$ con $(b_1,b_2)$.
@@ -318,32 +308,36 @@
 		El punto $(2,2)$ pertenece a la recta que une el centro $(0,0)$ con el punto $(6,6)$.
 	\end{block}
 
+	\pause
 	Traduciendo, tenemos que:
 
-	\begin{itemize} 
-		\item $h_1(x,y) = 6x-6y$
-		\item $h_2(x,y) = x-2$
-		\item $c(x,y) = y-2$
-	\end{itemize}
+	\begin{align*}
+		h_1(x,y) & = 6x-6y\\
+		h_2(x,y) & = x-2\\
+		c(x,y) &= y-2
+	\end{align*}
 
 	Luego $c \in \gen{h_1,h_2}$
 \end{frame}
 
-\begin{frame}{Dos lineas paralelas no se cruzan}
+\begin{frame}{Dos lineas paralelas si las une una perpendicular}
 
-\begin{block}{Proposición}
-	El punto $(2,2)$ pertenece a la recta que une el centro $(0,0)$ con el punto $(6,6)$.
-\end{block}
+	\begin{block}{Proposición}
+		Sean $A=(0,0)$, $B=(x_1,x_2)$, $C=(x_3,y_3)$ y $D=(x_2,y_2)$, puntos tales que $AB \perp AC$ y $CD \perp AC$ entonces $AB \parallel CD$.
+	\end{block}
+	\pause
+	Traduciendo, tenemos que:
+	\begin{align*}
+		h_1& =y_1y_3+x_1x_3 & AB \perp AC \\
+		h_2& =y_3(y_2-y_3)+x_3(x_2-x_3) = y_3y_2-y_3^2+x_2x_3-x_3^2 & CD \perp AC\\
+		h_3& =(z_2x_3-1)(z_3y_3-1)=z_2x_3z_3y_3-z_2x_3-z_3y_3+1 &  A\neq C\\
+		c & = y_1(x_2-x_3)-x_1(y_2-y_3)= y_1x_2-y_1x_3-x_1y_2+x_1y_3 & AB \parallel CD
+	\end{align*}
 
-Traduciendo, tenemos que:
-
-\begin{itemize} 
-	\item $h_1(x,y) = 6x-6y$
-	\item $h_2(x,y) = x-2$
-	\item $c(x,y) = y-2$
-\end{itemize}
-
-Luego $c \in \gen{h_1,h_2}$
+Luego $c \in \gen{h_1,h_2,h_3}$
+\end{frame}
+\begin{frame}
+	\centering \Large \textbf{Gracias por su atención.}
 \end{frame}
 \end{document}
 
